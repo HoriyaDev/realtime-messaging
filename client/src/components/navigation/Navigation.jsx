@@ -19,7 +19,7 @@ const Navigation = () => {
   };
 
   return (
-    <div className="w-24 bg-slate-200 dark:bg-zinc-700 flex flex-col justify-start items-center gap-4">
+    <div className="w-14 bg-slate-200 dark:bg-zinc-700 flex flex-col justify-start items-center gap-4">
      <ChatList />
       <button >
         <HiOutlineUserGroup size={30} className="dark:text-white" />
