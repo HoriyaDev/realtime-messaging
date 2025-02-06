@@ -162,69 +162,7 @@ const SignIn = () => {
 
 
      </section>
-    // <div className='w-1/2 h-[500px] mx-auto mt-20 flex flex-col items-center justify-center'>
-      
-    //   <h1 className='mb-10 text-center'>Sign in </h1>
-
-    //   <form onSubmit={handleLogin}>
-    //     <div className="relative mb-8">
-    //       <label htmlFor="email" className="absolute top-3 left-6 z-10 text-blue-700">Email</label>
-    //       <input
-    //         type="email"
-    //         id="email"
-    //         name='email'
-    //         value={input.email}
-    //         onChange={handleInput}
-    //         className="w-[520px] h-[70px] pl-5 pt-6 border-blue-600 border-2 text-xl rounded-full focus:outline-none"
-    //       />
-    //     </div>
-
-    //     <div className="relative mb-8">
-    //       <label htmlFor="password" className="absolute top-3 left-6 z-10 text-blue-700">Password</label>
-    //       <input
-    //         type={showPassword ? "text" : "password"}
-    //         id="password"
-    //         value={input.password}
-    //         onChange={handleInput}
-    //         name='password'
-    //         className="w-[520px] h-[70px] pl-5 pt-6 border-blue-600 border-2 text-xl rounded-full focus:outline-none"
-    //       />
-    //       <button
-    //         type='button'
-    //         className='absolute inset-y-0 right-8 text-blue-700 z-20'
-    //         onClick={handleShow}
-    //       >
-    //         {showPassword ? <BsEyeFill size={'20px'} /> : <BsEyeSlash size={'20px'} />}
-    //       </button>
-    //     </div>
-
-    //     <button
-    //       type='submit'
-    //       className='w-[520px] h-[50px] mt-2 text-white bg-blue-500 rounded-full text-xl'
-    //     >
-    //       Login
-    //     </button>
-
-    //     <div className='mt-5 text-center'>
-    //       <p>Don't have an account?
-    //         <Link to="/sign-up" className='font-bold'> Sign up Here</Link>
-    //       </p>
-    //     </div>
-    //   </form>
-    //   <ToastContainer
-    //     position="top-center"
-    //     autoClose={2000}
-    //     hideProgressBar={false}
-    //     newestOnTop={false}
-    //     closeOnClick
-    //     rtl={false}
-    //     pauseOnFocusLoss
-    //     draggable
-    //     pauseOnHover
-    //     theme="light"
-    //     transition={Slide} // Using Slide transition
-    //   />
-    // </div> */}
+    
   );
 };
 

@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import { BsEyeSlashFill, BsEyeFill } from "react-icons/bs";
+import {createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 import { Link } from "react-router-dom";
 
+
+
+
 const SignUp = () => {
+  
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -21,6 +27,10 @@ const SignUp = () => {
     passwordError: "",
     confirmPasswordError: "",
   });
+
+
+
+  
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -110,8 +120,19 @@ const SignUp = () => {
     setShowConfirm(!showConfirm);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
+
+
+   try{
+    await createUserWithEmailAndPassword(auth , input.email , input.password)
+    const user = auth.currentUser;
+    console.log(user)
+   }
+   catch(error){
+    console.log(error.message)
+   }
 
     if (Validation()) {
       localStorage.setItem("user", JSON.stringify(input));

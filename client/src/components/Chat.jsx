@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IoMdSend } from "react-icons/io";
 import { io } from "socket.io-client";
+import Header from "./header/Header";
 
 const socket = io("http://localhost:3001", { transports: ["websocket"] });
 
@@ -43,6 +44,8 @@ const Chat = () => {
 
   return (
     <div className="w-2/3 ml-auto absolute right-0 flex flex-col justify-end h-screen p-4 bg-slate-700 dark:bg-orange-300">
+          
+     
       <div className="flex flex-col gap-2 mb-4">
         {messages.map((msg, index) => (
           <div

@@ -1,0 +1,20 @@
+export const people = [
+    { id: 1, name: "Alice", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 2, name: "Bob", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 3, name: "Charlie", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 4, name: "David", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 5, name: "Eva", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 6, name: "Frank", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 7, name: "Grace", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 8, name: "Henry", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 9, name: "Ivy", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 10, name: "Jack", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 11, name: "Kate", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 12, name: "Leo", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 13, name: "Mia", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 14, name: "Nathan", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 15, name: "Olivia", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 16, name: "Peter", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 17, name: "Quinn", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] },
+    { id: 18, name: "Rachel", imgSrc: "profile.jpg", text: "new message arrive in night", chat: [] }
+];

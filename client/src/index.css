@@ -3,6 +3,35 @@
 @tailwind utilities;
 
 
+/* Hide the scrollbar but keep scrolling enabled */
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom Scrollbar */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+/* Handle */
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #4a5568; /* Tailwind Gray-700 */
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+/* Handle on hover */
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: #2d3748; /* Tailwind Gray-800 */
+}
+
+
 
 
 body {
