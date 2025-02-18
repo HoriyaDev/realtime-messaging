@@ -34,11 +34,11 @@
 
 
 import React, { useEffect, useState } from "react";
-import Chat from "./components/Chat";
-import Navigation from "./components/navigation/Navigation";
-import ChatListModal from "./components/modal/ChatListModal"; // Import ChatListModal
-import Sidebar from "./components/Sidebar";
-import Header from "./components/header/Header";
+import Chat from "./Chat";
+import Navigation from "./navigation/Navigation";
+import ChatListModal from "./modal/ChatListModal"; // Import ChatListModal
+import Sidebar from "./Sidebar";
+import Header from "./header/Header";
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState({ name: "", image: "" });

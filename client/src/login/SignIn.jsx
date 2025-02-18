@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { BsEyeSlash, BsEyeFill } from "react-icons/bs";
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast, Slide } from 'react-toastify';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -25,12 +27,12 @@ const SignIn = () => {
     }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {  // Make function async
     e.preventDefault();
-    const loggedData = JSON.parse(localStorage.getItem("user"));
   
-    if (input.email.trim() === "" && input.password.trim() === "") {
-      toast.warn('Fill the fields', {
+    // Check if fields are empty
+    if (input.email.trim() === "" || input.password.trim() === "") {
+      toast.warn("Fill the fields", {
         position: "top-center",
         autoClose: 2000,
         hideProgressBar: false,
@@ -40,8 +42,20 @@ const SignIn = () => {
         progress: undefined,
         theme: "light",
       });
-    } else if (loggedData && input.email === loggedData.email && input.password === loggedData.password) {
-      toast.success('Login Successfully', {
+      return; // Stop execution if fields are empty
+    }
+  
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        input.email,
+        input.password
+      );
+  
+      console.log(userCredential.user.email); // Access the user from userCredential
+  
+      // Show success toast
+      toast.success("Login successful!", {
         position: "top-center",
         autoClose: 2000,
         hideProgressBar: false,
@@ -52,23 +66,37 @@ const SignIn = () => {
         theme: "light",
       });
   
-      // Delay the navigation to the dashboard to allow the success toast to show
+      // Delay navigation to allow toast to show (2 seconds)
       setTimeout(() => {
-        localStorage.setItem("logged", "true");
-        navigate('/home');
-      }, 2000); // Delay of 2 seconds (matches the toast duration)
-      
-    } else {
-      toast.warn('Incorrect email and password', {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+        navigate("./home");
+      }, 2000);
+    } catch (error) {
+      console.log(error.code); // Log the error code
+  
+      // Show error toast only for incorrect credentials
+      if (error.code === "auth/invalid-credential") {
+        toast.error("Incorrect email or password", {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } else {
+        toast.error("Login failed. Please try again.", {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
     }
   };
   

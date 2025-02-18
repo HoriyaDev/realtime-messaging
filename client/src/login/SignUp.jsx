@@ -2,15 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast, Slide } from "react-toastify";
 import { BsEyeSlashFill, BsEyeFill } from "react-icons/bs";
-import {createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { Link } from "react-router-dom";
-
-
-
+import { db } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 const SignUp = () => {
-  
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -27,10 +25,6 @@ const SignUp = () => {
     passwordError: "",
     confirmPasswordError: "",
   });
-
-
-
-  
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -65,7 +59,7 @@ const SignUp = () => {
   };
 
   const Validation = () => {
-    let newError = { ...error }; // Create a new error object to track validation messages
+    let newError = { ...error };
     let isValid = true;
 
     const { name, email, password, confirmPassword } = input;
@@ -122,46 +116,54 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
 
+    if (!Validation()) {
+      toast.error("Please fix the errors!", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+      return;
+    }
 
-   try{
-    await createUserWithEmailAndPassword(auth , input.email , input.password)
-    const user = auth.currentUser;
-    console.log(user)
-   }
-   catch(error){
-    console.log(error.message)
-   }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        input.email,
+        input.password
+      );
+      const user = userCredential.user;
 
-    if (Validation()) {
-      localStorage.setItem("user", JSON.stringify(input));
+      console.log("Firebase Auth User UID:", user.uid);
+
+      await addSignUp(user.uid);
 
       toast.success("Sign up successfully!", {
         position: "top-center",
-        autoClose: 2000, // Duration of the toast (2 seconds)
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+        autoClose: 2000,
       });
 
       setTimeout(() => {
         navigate("/");
       }, 2000);
-    } else {
-      toast.error("Please fix the errors!", {
-        position: "top-center",
-        autoClose: 2000, // Duration of the toast (2 seconds)
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+    } catch (error) {
+      console.error("Error:", error.message);
+      toast.error(error.message);
+    }
+  };
+
+  const addSignUp = async (userId) => {
+    try {
+      const userRef = await addDoc(collection(db, "users"), {
+        name: input.name,
+        email: input.email,
+        password: input.password,
+        confirmPassword: input.confirmPassword,
+        LoggedUserId: userId,
       });
+
+      console.log("Firestore User Document ID:", userRef.id);
+    } catch (error) {
+      console.error("Firestore Error:", error.message);
     }
   };
 
@@ -187,7 +189,9 @@ const SignUp = () => {
                 name="name"
                 value={input.name}
                 onChange={handleInput}
-                className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${error.nameError ? "border-red-500" : ""}`}
+                className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${
+                  error.nameError ? "border-red-500" : ""
+                }`}
                 placeholder="John Doe"
                 required
               />
@@ -210,7 +214,9 @@ const SignUp = () => {
                 name="email"
                 value={input.email}
                 onChange={handleInput}
-                className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${error.emailError ? "border-red-500" : ""}`}
+                className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${
+                  error.emailError ? "border-red-500" : ""
+                }`}
                 placeholder="john.doe@company.com"
                 required
               />
@@ -222,7 +228,10 @@ const SignUp = () => {
 
           {/* Password Fields */}
           <div className="mb-6">
-            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-sm font-medium text-gray-900"
+            >
               Password:
               <div className="relative">
                 <input
@@ -231,7 +240,9 @@ const SignUp = () => {
                   name="password"
                   value={input.password}
                   onChange={handleInput}
-                  className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${error.passwordError ? "border-red-500" : ""}`}
+                  className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${
+                    error.passwordError ? "border-red-500" : ""
+                  }`}
                   placeholder="•••••••••"
                   required
                 />
@@ -240,7 +251,11 @@ const SignUp = () => {
                   onClick={togglePasswordVisibility}
                   className="absolute inset-y-5 right-3 flex items-center z-20"
                 >
-                  {showPassword ? <BsEyeFill size={18} /> : <BsEyeSlashFill size={18} />}
+                  {showPassword ? (
+                    <BsEyeFill size={18} />
+                  ) : (
+                    <BsEyeSlashFill size={18} />
+                  )}
                 </button>
               </div>
             </label>
@@ -262,7 +277,9 @@ const SignUp = () => {
                   name="confirmPassword"
                   value={input.confirmPassword}
                   onChange={handleInput}
-                  className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${error.confirmPasswordError ? "border-red-500" : ""}`}
+                  className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5 ${
+                    error.confirmPasswordError ? "border-red-500" : ""
+                  }`}
                   placeholder="•••••••••"
                   required
                 />
@@ -271,12 +288,18 @@ const SignUp = () => {
                   onClick={toggleConfirmPasswordVisibility}
                   className="absolute inset-y-5 right-3 flex items-center z-20"
                 >
-                  {showConfirm ? <BsEyeFill size={18} /> : <BsEyeSlashFill size={18} />}
+                  {showConfirm ? (
+                    <BsEyeFill size={18} />
+                  ) : (
+                    <BsEyeSlashFill size={18} />
+                  )}
                 </button>
               </div>
             </label>
             {error.confirmPasswordError && (
-              <p className="text-red-500 text-sm">{error.confirmPasswordError}</p>
+              <p className="text-red-500 text-sm">
+                {error.confirmPasswordError}
+              </p>
             )}
           </div>
 
@@ -306,18 +329,13 @@ const SignUp = () => {
           </button>
         </form>
 
-        <div className='flex mt-5 text-center justify-center'>
-            <p>Already have an account?</p>
-            <Link to='/' className='font-bold ml-1'>
-              Login Here
-            </Link>
-          </div>
+        <div className="flex mt-5 text-center justify-center">
+          <p>Already have an account?</p>
+          <Link to="/" className="font-bold ml-1">
+            Login Here
+          </Link>
+        </div>
       </div>
-
-
-
-
-     
 
       {/* Toast Container */}
       <ToastContainer transition={Slide} />

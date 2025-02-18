@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useUser } from "../../context/UserContext";
 import { FaCheck } from "react-icons/fa6";
 import { IoCameraSharp } from "react-icons/io5";
+import { db } from "../../firebase";
+
 
 const ProfileModal = ({ open }) => {
-  const { name } = useUser();
+  // const { name } = useUser();
   const [input, setInput] = useState("");
   const [count, setCount] = useState(50);
   const [image, setImage] = useState("/default-user.png");
@@ -18,6 +20,11 @@ const ProfileModal = ({ open }) => {
       setCount(50 - storedBio.length); // Adjust count based on stored value
     }
   }, []);
+
+
+
+
+ 
 
   const handleClick = () =>{
     fileInputRef.current.click();
@@ -85,7 +92,7 @@ const ProfileModal = ({ open }) => {
             <p className="dark:text-white mt-10 font-medium text-xl pl-4">
               Your name
             </p>
-            <p className="dark:text-white font-medium text-lg pl-4">{name}</p>
+            <p className="dark:text-white font-medium text-lg pl-4"></p>
 
             <div className="p-6 mt-5 dark:text-slate-300">
               <p>This name will be visible to your contacts</p>
