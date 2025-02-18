@@ -4,12 +4,12 @@ import CategoryTab from '../category/CategoryTab';
 import AllChat from '../chatlistCategory/AllChat';
 
 
-const ChatListModal = ({open}) => {
+const ChatListModal = () => {
 
 
   return (
     <>
-    {open && (
+     
 
         <div className="fixed top-0 left-[56px] z-50 w-[433px] h-full">
           
@@ -30,7 +30,7 @@ const ChatListModal = ({open}) => {
                   
           </div>
           </div>
-    )}
+    
     </>
   )
 }

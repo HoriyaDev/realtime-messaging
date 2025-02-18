@@ -1,41 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const AllChat = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      console.log("No user is logged in.");
-      setLoading(false);
-      return;
-    }
+    // Listen for authentication state changes
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        console.log("No user is logged in.");
+        setLoading(false);
+        return;
+      }
 
-    console.log("Current User UID:", currentUser.uid);
+      console.log("Current User UID:", currentUser.uid);
 
-    // Create a Firestore query
-    const q = query(collection(db, "users"));
+      // Create a Firestore query
+      const q = query(collection(db, "users"));
 
-    // Real-time listener using onSnapshot
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const allUsers = querySnapshot.docs.map((doc) => doc.data());
-      console.log("Fetched Users:", allUsers);
+      // Real-time listener using onSnapshot
+      const unsubscribeFirestore = onSnapshot(q, (querySnapshot) => {
+        const allUsers = querySnapshot.docs.map((doc) => doc.data());
+        console.log("Fetched Users:", allUsers);
 
-      // Filter out the currently logged-in user
-      const filteredUsers = allUsers.filter(
-        (user) => user.LoggedUserId !== currentUser.uid
-      );
+        // Filter out the currently logged-in user
+        const filteredUsers = allUsers.filter(
+          (user) => user.LoggedUserId !== currentUser.uid
+        );
 
-      console.log("Filtered Users:", filteredUsers);
-      setUsers(filteredUsers);
-      setLoading(false);
+        console.log("Filtered Users:", filteredUsers);
+        setUsers(filteredUsers);
+        setLoading(false);
+      });
+
+      // Cleanup Firestore listener
+      return () => unsubscribeFirestore();
     });
 
-    
-    return () => unsubscribe();
+    // Cleanup auth listener
+    return () => unsubscribeAuth();
   }, []);
 
   if (loading) {

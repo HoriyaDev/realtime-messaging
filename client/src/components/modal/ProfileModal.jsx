@@ -1,35 +1,56 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useUser } from "../../context/UserContext";
 import { FaCheck } from "react-icons/fa6";
 import { IoCameraSharp } from "react-icons/io5";
-import { db } from "../../firebase";
-
+import { collection, query, onSnapshot, where } from "firebase/firestore";
+import { db, auth } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const ProfileModal = ({ open }) => {
-  // const { name } = useUser();
   const [input, setInput] = useState("");
   const [count, setCount] = useState(50);
   const [image, setImage] = useState("/default-user.png");
-  const fileInputRef = useRef(null); // Default image
+  const [userName, setUserName] = useState(""); 
+  const fileInputRef = useRef(null);
 
-  // Load bio from local storage when component mounts
+  useEffect(() => {
+    
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        console.log("No user is logged in.");
+        return;
+      }
+
+      console.log("Current User UID:", currentUser.uid);
+      const q = query(
+        collection(db, "users"),
+        where("LoggedUserId", "==", currentUser.uid)
+      );
+
+      const unsubscribeFirestore = onSnapshot(q, (querySnapshot) => {
+        if (!querySnapshot.empty) {
+          const userData = querySnapshot.docs[0].data();
+          console.log("Fetched User:", userData);
+          setUserName(userData.name);
+        }
+      });
+
+      return () => unsubscribeFirestore();
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
+
   useEffect(() => {
     const storedBio = JSON.parse(localStorage.getItem("bio"));
     if (storedBio) {
       setInput(storedBio);
-      setCount(50 - storedBio.length); // Adjust count based on stored value
+      setCount(50 - storedBio.length);
     }
   }, []);
 
-
-
-
- 
-
-  const handleClick = () =>{
+  const handleClick = () => {
     fileInputRef.current.click();
-
-  }
+  };
 
   const handleInput = (e) => {
     const value = e.target.value;
@@ -65,7 +86,10 @@ const ProfileModal = ({ open }) => {
             </p>
 
             <div className="py-5 flex flex-col items-center">
-              <div className="relative w-44 h-44 rounded-full overflow-hidden"  onClick={handleClick}>
+              <div
+                className="relative w-44 h-44 rounded-full overflow-hidden"
+                onClick={handleClick}
+              >
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 transition-opacity duration-300 hover:opacity-100 rounded-full">
                   <span className="text-white text-sm font-semibold flex flex-col justify-center items-center text-center">
                     <IoCameraSharp className="mx-auto text-xl" />
@@ -76,7 +100,6 @@ const ProfileModal = ({ open }) => {
                   </span>
                 </div>
 
-                {/* Image */}
                 <img
                   src={image}
                   className="w-full h-full object-cover"
@@ -84,15 +107,21 @@ const ProfileModal = ({ open }) => {
                 />
               </div>
 
-              {/* File Input */}
-              <input type="file" className="mt-4 hidden pointer" onChange={handleImage} 
-                        ref={fileInputRef} />
+              <input
+                type="file"
+                className="mt-4 hidden pointer"
+                onChange={handleImage}
+                ref={fileInputRef}
+              />
             </div>
 
             <p className="dark:text-white mt-10 font-medium text-xl pl-4">
               Your name
             </p>
-            <p className="dark:text-white font-medium text-lg pl-4"></p>
+            {/* ✅ Show current logged-in user's name */}
+            <p className="dark:text-white font-medium text-lg pl-4">
+              {userName || "Loading..."}
+            </p>
 
             <div className="p-6 mt-5 dark:text-slate-300">
               <p>This name will be visible to your contacts</p>
