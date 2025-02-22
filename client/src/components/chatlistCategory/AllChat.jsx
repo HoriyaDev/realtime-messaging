@@ -1,4 +1,10 @@
+
+
 import React, { useEffect, useState } from "react";
+
+import { db, auth } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { useChat } from "../../context/ChatContext";
 import {
   collection,
   query,
@@ -9,96 +15,141 @@ import {
   getDocs,
   addDoc,
   setDoc,
-} from "firebase/firestore";
-import { db, auth } from "../../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+  Timestamp,
+  serverTimestamp,
+} from "firebase/firestore"; 
 
 const AllChat = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [seletedUser, setSelectedUser] = useState();
+  const { setSelectedUser } = useChat(); // Use Context to set selected user
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       if (!currentUser) {
-        console.log("No user is logged in.");
         setLoading(false);
         return;
       }
 
-      console.log("Current User UID:", currentUser.uid);
-
       const q = query(collection(db, "users"));
 
-      // Real-time listener using onSnapshot
       const unsubscribeFirestore = onSnapshot(q, (querySnapshot) => {
         const allUsers = querySnapshot.docs.map((doc) => doc.data());
-        console.log("Fetched Users:", allUsers);
 
         // Filter out the currently logged-in user
         const filteredUsers = allUsers.filter(
           (user) => user.LoggedUserId !== currentUser.uid
         );
 
-        console.log("Filtered Users:", filteredUsers);
         setUsers(filteredUsers);
         setLoading(false);
       });
 
-      // Cleanup Firestore listener
       return () => unsubscribeFirestore();
     });
 
-    // Cleanup auth listener
     return () => unsubscribeAuth();
   }, []);
 
-  if (loading) {
-    return <p className="text-gray-500 dark:text-white">Loading users...</p>;
-  }
-
   const handleClick = async (user) => {
     const currentUser = auth.currentUser;
-    console.log("current_user", currentUser.uid);
+    setSelectedUser(user);
 
-    console.log("selected-user", user.LoggedUserId);
+    if (!currentUser) {
+        console.error("No user is currently logged in.");
+        return;
+    }
+
+    console.log("Current User UID:", currentUser.uid);
+    console.log("Selected User UID:", user.LoggedUserId);
 
     const selectedPerson = user.LoggedUserId;
     const chatRoomId = generateChatRoom(currentUser.uid, selectedPerson);
     console.log("Chat Room ID:", chatRoomId);
 
-    const chatRef = doc(db, "chatRooms", chatRoomId); // Ensure "chatRooms" is your collection name
-    await setDoc(chatRef, {
-      id: chatRoomId,
-      user1: user.name,
-      user2: currentUser.displayName,
-    });
+    try {
+        // Fetch current user's name
+        const q = query(
+            collection(db, "users"),
+            where("LoggedUserId", "==", currentUser.uid)
+        );
 
-    console.log(chatRef);
-  };
+        const querySnapshot = await getDocs(q);
 
-  const generateChatRoom = (uid1, uid2) => {
-    const UIDSArray = [uid1, uid2].sort((a, b) => a.localeCompare(b));
+        if (querySnapshot.empty) {
+            console.error("Current user not found in Firestore.");
+            return;
+        }
 
-    const sortedUIDS = `${UIDSArray[0]}_${UIDSArray[1]}`;
-    return sortedUIDS;
-  };
+        const userData = querySnapshot.docs[0].data();
+        const currentUserName = userData.name || "Unknown";
+
+        console.log("Fetched User Name:", currentUserName);
+
+        // Check if chat room already exists
+        const chatRef = doc(db, "chatRooms", chatRoomId);
+        const chatDoc = await getDoc(chatRef);
+
+        if (!chatDoc.exists()) {
+            // Create new chat room
+            await setDoc(chatRef, {
+                id: chatRoomId,
+                user1: currentUserName,
+                user2: user.name || "Unknown",
+                createdAt: serverTimestamp(),
+            });
+
+            console.log("Chat room created successfully!");
+        } else {
+            console.log("Chat room already exists.");
+        }
+
+        // Create a messages subcollection inside the chat room
+        const messageRef = doc(db, "chatRooms", chatRoomId, "messages", "initialMessage");
+
+        await setDoc(messageRef, {
+            message: "Hello World",
+            senderId: currentUser.uid,
+            timestamp: serverTimestamp(),
+        });
+
+        console.log("Message subcollection created successfully!");
+
+    } catch (error) {
+        console.error("Error creating chat room or messages:", error);
+    }
+};
+    
+    // generate chat room
+      const generateChatRoom = (uid1, uid2) => {
+        const UIDSArray = [uid1, uid2].sort((a, b) => a.localeCompare(b));
+    
+        const sortedUIDS = `${UIDSArray[0]}_${UIDSArray[1]}`;
+        return sortedUIDS;
+      };
+    
+    
+
+
+
+  if (loading) return <p>Loading users...</p>;
 
   return (
-    <div className="h-[500px] overflow-y-auto scrollbar-custom p-2">
+    <div className="h-[500px] overflow-y-auto p-2">
       {users.length > 0 ? (
         users.map((user) => (
           <div
             key={user.LoggedUserId}
             className="flex gap-4 mt-3 p-2 border-b cursor-pointer"
+            // onClick={() => setSelectedUser(user)} 
+            
+            onClick={() => handleClick(user)}// Set selected user in context
           >
-            <div onClick={() => handleClick(user)}>
-              <p className="font-semibold dark:text-white">{user.name}</p>
-            </div>
+            <p className="font-semibold">{user.name}</p>
           </div>
         ))
       ) : (
-        <p className="text-gray-500 dark:text-white">No users available</p>
+        <p>No users available</p>
       )}
     </div>
   );
