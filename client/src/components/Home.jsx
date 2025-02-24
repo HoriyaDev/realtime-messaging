@@ -19,15 +19,13 @@ const Home = () => {
   return (
  <ChatProvider>
 
-
 <div className="flex h-screen">
-      <Navigation />
-      
-       <div className="flex-1">
-          <Chat />
-        </div>
-      
-    </div>
+  <Navigation />
+  
+  <div className="flex-1 hidden sm:block"> {/* Hide on small screens, show on larger screens */}
+    <Chat />
+  </div>
+</div>
  </ChatProvider>
   );
 };

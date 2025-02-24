@@ -79,8 +79,8 @@ const ProfileModal = ({ open }) => {
   return (
     <>
       {open && (
-        <div className="fixed top-0 left-[56px] z-50 w-[433px] h-full">
-          <div className="relative bg-white w-[399px] dark:bg-zinc-800 h-screen">
+        <div className="fixed top-0 left-0 sm:left-[56px]  w-full sm:w-[399px] h-96 sm:h-96">
+          <div className="relative bg-white w-full sm:w-[399px] dark:bg-zinc-800 h-[calc(100vh-56px)] sm:h-screen p-4 mx-auto">
             <p className="dark:text-white font-semibold text-2xl p-4">
               Profile
             </p>
