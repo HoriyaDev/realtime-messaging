@@ -173,10 +173,16 @@ import { collection, query, onSnapshot, where, getDocs, setDoc, doc, getDoc, ser
 const AllChat = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { setSelectedUser, setSelectedUserUID } = useChat();
+  const { setSelectedUser, setSelectedUserUID , setOpen } = useChat();
+
+
+
+  // Function to handle user selection
+ 
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+
       if (!currentUser) {
         setLoading(false);
         return;

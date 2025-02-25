@@ -1,32 +1,37 @@
 import React, { useEffect, useState } from "react";
 import Chat from "./Chat";
 import Navigation from "./navigation/Navigation";
-import Header from "./header/Header";
 import { ChatProvider } from "../context/ChatContext";
+import { useChat } from "../context/ChatContext";
 
 const Home = () => {
+  const { selectedUser } = useChat(); // Selected user from context
   const [userInfo, setUserInfo] = useState({ name: "", image: "" });
 
   useEffect(() => {
-    // Retrieve user data from localStorage
     const userData = localStorage.getItem("user");
     if (userData) {
-      const parsedData = JSON.parse(userData); // Parse the JSON data
-      setUserInfo({ name: parsedData.name, image: parsedData.image }); // Set name and image
+      const parsedData = JSON.parse(userData);
+      setUserInfo({ name: parsedData.name, image: parsedData.image });
     }
   }, []);
 
   return (
- <ChatProvider>
-
-<div className="flex h-screen">
-  <Navigation />
   
-  <div className="flex-1 hidden sm:block"> {/* Hide on small screens, show on larger screens */}
-    <Chat />
-  </div>
-</div>
- </ChatProvider>
+      <div className="flex h-screen">
+        {/* Navigation: Hide on small screens if user is selected */}
+        <div className={`${selectedUser ? "hidden sm:block" : "block"} w-1/4`}>
+          <Navigation />
+        </div>
+
+        {/* Chat: Show only if a user is selected */}
+        <div className={` ${selectedUser ? "block" : "hidden sm:block"} flex-1 `}>
+          {selectedUser ? <Chat /> :  <div className="w-2/3 ml-auto absolute right-0 flex items-center justify-center h-screen bg-slate-700">
+        <p className="text-gray-500 text-lg">Select a user to start chatting</p>
+      </div>}
+        </div>
+      </div>
+  
   );
 };
 
