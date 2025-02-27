@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { IoMdSend } from "react-icons/io";
 import { IoCall, IoVideocam } from "react-icons/io5";
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { FaArrowLeft } from "react-icons/fa6";
 import { useChat } from "../context/ChatContext";
 import { db, auth } from "../firebase";
 import {
@@ -11,11 +13,19 @@ import {
   orderBy,
   serverTimestamp,
 } from "firebase/firestore";
+import {
+  TEDropdown,
+  TEDropdownToggle,
+  TEDropdownMenu,
+  TEDropdownItem,
+  TERipple,
+} from "tw-elements-react"
+
 
 const Chat = () => {
   const [input, setInput] = useState({ message: "" });
   const [messages, setMessages] = useState([]);
-  const { selectedUser, selectedUserUID } = useChat();
+  const { selectedUser, selectedUserUID , setSelectedUser } = useChat();
   const messagesEndRef = useRef(null);
 
   // Generate Chat Room ID
@@ -64,6 +74,13 @@ const Chat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+const handleBack = () =>{
+ 
+  
+  setSelectedUser(null);
+}
+ 
+   
 
   return (
     <>
@@ -77,9 +94,10 @@ const Chat = () => {
             <div className="flex items-center">
               {selectedUser && (
                 <>
+                <button className="block sm:hidden" onClick={handleBack}><FaArrowLeft /></button>
                   <img
                     src="Profile.jpg"
-                    className="w-12 h-12 object-cover rounded-full"
+                    className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-full"
                     alt={selectedUser.name || "User"}
                   />
                   <h1 className="text-black ml-2">{selectedUser.name || "Unknown"}</h1>
@@ -97,13 +115,14 @@ const Chat = () => {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`p-2 w-fit max-w-xs break-words rounded-md ${
+                className={`p-2 w-fit max-w-xs break-words rounded-md  z-10 ${
                   msg.senderId === auth.currentUser.uid
                     ? "bg-blue-600 text-white ml-auto"
                     : "bg-gray-400 text-black"
                 }`}
               >
                 <p>{msg.message}</p>
+                
               </div>
             ))}
             <div ref={messagesEndRef}></div>
@@ -113,12 +132,12 @@ const Chat = () => {
           <div className="flex items-center p-2 bg-slate-200">
             <input
               type="text"
-              className="p-2 w-full border-2 rounded-md"
+              className="p-2 w-full border-2 rounded-md z-10"
               placeholder="Type a message"
               onChange={handleInput}
               value={input.message}
             />
-            <button className="p-3 bg-blue-500 text-white rounded-md ml-2" onClick={handleClick}>
+            <button className="p-3 bg-blue-500 text-white rounded-md ml-2 z-10" onClick={handleClick}>
               <IoMdSend />
             </button>
           </div>
